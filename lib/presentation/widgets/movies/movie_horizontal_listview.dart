@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class MovieHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
@@ -131,9 +131,9 @@ class _Slide extends StatelessWidget {
                 Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
                 const SizedBox(width: 3),
                 Text(
-                  '${movie.voteAverage}',
+                  HumanFormats.number(movie.voteAverage, 1),
                   style: textStyles.bodyMedium
-                      ?.copyWith(color: Colors.yellow.shade800),
+                      ?.copyWith(color: Colors.yellow.shade900),
                 ),
                 //const SizedBox(width: 10),
                 const Spacer(),
