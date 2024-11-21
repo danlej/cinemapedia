@@ -15,7 +15,7 @@ class MovieDetails {
   final String posterPath;
   final List<ProductionCompany> productionCompanies;
   final List<ProductionCountry> productionCountries;
-  final DateTime releaseDate;
+  final DateTime? releaseDate;
   final int revenue;
   final int runtime;
   final List<SpokenLanguage> spokenLanguages;
@@ -71,14 +71,17 @@ class MovieDetails {
         originalTitle: json["original_title"],
         overview: json["overview"],
         popularity: json["popularity"]?.toDouble(),
-        posterPath: json["poster_path"],
+        posterPath: json["poster_path"] ?? '',
         productionCompanies: List<ProductionCompany>.from(
             json["production_companies"]
                 .map((x) => ProductionCompany.fromJson(x))),
         productionCountries: List<ProductionCountry>.from(
             json["production_countries"]
                 .map((x) => ProductionCountry.fromJson(x))),
-        releaseDate: DateTime.parse(json["release_date"]),
+        releaseDate: json["release_date"] != null &&
+                json["release_date"].toString().isNotEmpty
+            ? DateTime.parse(json["release_date"])
+            : null,
         revenue: json["revenue"],
         runtime: json["runtime"],
         spokenLanguages: List<SpokenLanguage>.from(
@@ -110,8 +113,9 @@ class MovieDetails {
             List<dynamic>.from(productionCompanies.map((x) => x.toJson())),
         "production_countries":
             List<dynamic>.from(productionCountries.map((x) => x.toJson())),
-        "release_date":
-            "${releaseDate.year.toString().padLeft(4, '0')}-${releaseDate.month.toString().padLeft(2, '0')}-${releaseDate.day.toString().padLeft(2, '0')}",
+        "release_date": (releaseDate != null)
+            ? "${releaseDate!.year.toString().padLeft(4, '0')}-${releaseDate!.month.toString().padLeft(2, '0')}-${releaseDate!.day.toString().padLeft(2, '0')}"
+            : null,
         "revenue": revenue,
         "runtime": runtime,
         "spoken_languages":
