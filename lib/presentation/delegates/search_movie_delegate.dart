@@ -22,6 +22,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
 
   void clearStreams() {
     debouncedMovies.close();
+    isLoadingStream.close();
   }
 
   void _onQueryChanged(String query) {
@@ -30,11 +31,11 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
     }
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
-      isLoadingStream.add(true);
+      if (!isLoadingStream.isClosed) isLoadingStream.add(true);
       final movies = await searchMovies(query);
       initialMovies = movies;
-      debouncedMovies.add(movies);
-      isLoadingStream.add(false);
+      if (!debouncedMovies.isClosed) debouncedMovies.add(movies);
+      if (!isLoadingStream.isClosed) isLoadingStream.add(false);
     });
   }
 
