@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/delegates/search_movie_delegate.dart';
@@ -12,6 +12,7 @@ class CustomAppbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final titleStyle = Theme.of(context).textTheme.titleMedium;
+    final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
     return SafeArea(
       bottom: false,
@@ -46,6 +47,14 @@ class CustomAppbar extends ConsumerWidget {
                   });
                 },
                 icon: const Icon(Icons.search),
+              ),
+              IconButton(
+                onPressed: () {
+                  ref.read(themeNotifierProvider.notifier).toggleDarkMode();
+                },
+                icon: isDarkMode
+                    ? const Icon(Icons.dark_mode_outlined)
+                    : const Icon(Icons.light_mode_outlined),
               )
             ],
           ),
