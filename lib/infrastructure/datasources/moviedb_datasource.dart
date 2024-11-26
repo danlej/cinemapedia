@@ -10,7 +10,7 @@ class MoviedbDatasource extends MoviesDatasource {
       baseUrl: 'https://api.themoviedb.org/3',
       queryParameters: {
         'api_key': Environment.theMovieDbKey,
-        'languange': 'es-es'
+        'languange': 'en-US'
       }));
 
   List<Movie> _jsonToMovies(Map<String, dynamic> json) {

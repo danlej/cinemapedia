@@ -43,7 +43,7 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
       body: CustomScrollView(
         physics: const ClampingScrollPhysics(),
         slivers: [
-          _CustomSliverAppbar(movie: movie),
+          _CustomSliverAppBar(movie: movie),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) => _MovieDetails(movie: movie),
@@ -180,10 +180,10 @@ final isFavoriteProvider =
   return localStorageRepository.isMovieFavorite(movieId);
 });
 
-class _CustomSliverAppbar extends ConsumerWidget {
+class _CustomSliverAppBar extends ConsumerWidget {
   final Movie movie;
 
-  const _CustomSliverAppbar({
+  const _CustomSliverAppBar({
     required this.movie,
   });
 

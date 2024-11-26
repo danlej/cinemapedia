@@ -9,3 +9,4 @@ export 'shared/custom_appbar.dart';
 export 'shared/custom_bottom_navigation.dart';
 export 'shared/full_screen_loader.dart';
 export 'videos/videos_from_movie.dart';
+export 'videos/youtube_video_player.dart';
