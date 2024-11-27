@@ -5,7 +5,7 @@ import 'package:cinemapedia/presentation/providers/actors/actors_repository_prov
 final actorsByMovieProvider =
     StateNotifierProvider<ActorsByMovieNotifier, Map<String, List<Actor>>>(
         (ref) {
-  final getActors = ref.watch(actorsRespositoryProvider).getActorsByMovie;
+  final getActors = ref.watch(actorsRepositoryProvider).getActorsByMovie;
 
   return ActorsByMovieNotifier(getActors: getActors);
 });
