@@ -10,7 +10,7 @@ final genreMoviesProvider = FutureProvider.family((ref, int genreId) {
   return movieRepository.getMoviesByGenreId(genreId);
 });
 
-final selectedGenreProvider = StateProvider<int>((ref) => 0);
+final selectedGenreProvider = StateProvider<int>((ref) => 12);
 
 class GenresView extends ConsumerStatefulWidget {
   const GenresView({super.key});
@@ -23,6 +23,13 @@ class GenresViewState extends ConsumerState<GenresView>
     with AutomaticKeepAliveClientMixin {
   final ScrollController scrollController =
       ScrollController(); // Controlador para el desplazamiento
+
+  @override
+  void initState() {
+    super.initState();
+
+    ref.read(genresProvider.notifier).loadNextPage();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +54,7 @@ class GenresViewState extends ConsumerState<GenresView>
         return Column(
           children: [
             _GenreSelector(scrollController: scrollController, genres: genres),
-            Expanded(child: _GenreMoviesView(genres: genres)),
+            const Expanded(child: _GenreMoviesView()),
           ],
         );
       },
@@ -59,26 +66,18 @@ class GenresViewState extends ConsumerState<GenresView>
 }
 
 class _GenreMoviesView extends ConsumerWidget {
-  final List<Genre> genres;
-
-  const _GenreMoviesView({
-    required this.genres,
-  });
+  const _GenreMoviesView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedGenreId = ref.watch(selectedGenreProvider);
-
-    if (selectedGenreId == 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(selectedGenreProvider.notifier).state = genres.first.id;
-      });
-    }
-
     final genreMoviesFuture = ref.watch(genreMoviesProvider(selectedGenreId));
 
     return genreMoviesFuture.when(
-      data: (movies) => MovieMasonry(movies: movies),
+      data: (movies) => MovieMasonry(
+        movies: movies,
+        loadNextPage: () => ref.read(genresProvider.notifier).loadNextPage(),
+      ),
       error: (_, __) => const Center(
         child: Text('No se pudo cargar películas similares'),
       ),
@@ -101,6 +100,12 @@ class _GenreSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedGenreId = ref.watch(selectedGenreProvider);
+
+    // if (selectedGenreId == 0) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     ref.read(selectedGenreProvider.notifier).state = genres.first.id;
+    //   });
+    // }
 
     return SafeArea(
       child: Padding(
