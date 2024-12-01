@@ -36,7 +36,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   final viewRoutes = const <Widget>[
     HomeView(),
-    PopularView(), // <--- CategoriesView
+    //PopularView(),
+    GenresView(),
     FavoritesView(),
   ];
 

@@ -38,7 +38,7 @@ class CustomBottomNavigation extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.thumbs_up_down_outlined),
-          label: 'Populares',
+          label: 'Categorías',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite_outline),

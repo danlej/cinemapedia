@@ -9,6 +9,6 @@ class GenreRepositoryImpl extends GenresRepository {
 
   @override
   Future<List<Genre>> getOfficialGenresForMovies() async {
-    return datasource.getOfficialGenresForMovies();
+    return await datasource.getOfficialGenresForMovies();
   }
 }
