@@ -10,7 +10,7 @@ final genreMoviesProvider = FutureProvider.family((ref, int genreId) {
   return movieRepository.getMoviesByGenreId(genreId);
 });
 
-final selectedGenreProvider = StateProvider<int>((ref) => 12);
+final selectedGenreProvider = StateProvider<int>((ref) => 0);
 
 class GenresView extends ConsumerStatefulWidget {
   const GenresView({super.key});
@@ -24,12 +24,12 @@ class GenresViewState extends ConsumerState<GenresView>
   final ScrollController scrollController =
       ScrollController(); // Controlador para el desplazamiento
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    ref.read(genresProvider.notifier).loadNextPage();
-  }
+  //   ref.read(genresProvider.notifier).loadNextPage();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +101,11 @@ class _GenreSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedGenreId = ref.watch(selectedGenreProvider);
 
-    // if (selectedGenreId == 0) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     ref.read(selectedGenreProvider.notifier).state = genres.first.id;
-    //   });
-    // }
+    if (selectedGenreId == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(selectedGenreProvider.notifier).state = genres.first.id;
+      });
+    }
 
     return SafeArea(
       child: Padding(
