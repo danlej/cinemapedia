@@ -127,8 +127,7 @@ class _TitleAndOverview extends StatelessWidget {
                 MovieRating(voteAverage: movie.voteAverage),
                 Row(
                   children: [
-                    const Text('Estreno:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Premiere:', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(width: 5),
                     if (movie.releaseDate != null)
                       Text(HumanFormats.shortDate(movie.releaseDate!))
@@ -164,8 +163,7 @@ class _Genres extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 10),
                 child: Chip(
                   label: Text(gender),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
               ))
         ],
@@ -174,8 +172,7 @@ class _Genres extends StatelessWidget {
   }
 }
 
-final isFavoriteProvider =
-    FutureProvider.family.autoDispose((ref, int movieId) {
+final isFavoriteProvider = FutureProvider.family.autoDispose((ref, int movieId) {
   final localStorageRepository = ref.watch(localStorageRepositoryProvider);
   return localStorageRepository.isMovieFavorite(movieId);
 });
@@ -201,16 +198,13 @@ class _CustomSliverAppBar extends ConsumerWidget {
         IconButton(
           onPressed: () async {
             //ref.read(localStorageRepositoryProvider).toggleFavorite(movie);
-            await ref
-                .read(favoriteMoviesProvider.notifier)
-                .toggleFavorite(movie);
+            await ref.read(favoriteMoviesProvider.notifier).toggleFavorite(movie);
             ref.invalidate(isFavoriteProvider(movie.id));
           },
           icon: isFavoriteFuture.when(
             loading: () => const CircularProgressIndicator(strokeWidth: 2),
-            data: (isFavorite) => isFavorite
-                ? const Icon(Icons.favorite_rounded, color: Colors.red)
-                : const Icon(Icons.favorite_border),
+            data: (isFavorite) =>
+                isFavorite ? const Icon(Icons.favorite_rounded, color: Colors.red) : const Icon(Icons.favorite_border),
             error: (_, __) => throw UnimplementedError(),
           ),
         )

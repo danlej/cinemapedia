@@ -21,10 +21,8 @@ class SimilarMovies extends ConsumerWidget {
 
     return similarMoviesFuture.when(
       data: (movies) => _Recomendations(movies: movies),
-      error: (_, __) =>
-          const Center(child: Text('No se pudo cargar películas similares')),
-      loading: () =>
-          const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      error: (_, __) => const Center(child: Text('No se pudo cargar películas similares')),
+      loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
 }
@@ -40,7 +38,7 @@ class _Recomendations extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsetsDirectional.only(bottom: 50),
-      child: MovieHorizontalListview(title: 'Recomendaciones', movies: movies),
+      child: MovieHorizontalListview(title: 'Recommendations', movies: movies),
     );
   }
 }

@@ -61,7 +61,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   }
 
   @override
-  String get searchFieldLabel => 'Buscar película';
+  String get searchFieldLabel => 'Search Movie';
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -147,8 +147,7 @@ class _MovieItem extends StatelessWidget {
                   height: 130,
                   fit: BoxFit.cover,
                   image: NetworkImage(movie.posterPath),
-                  placeholder:
-                      const AssetImage('assets/loaders/bottle-loader.gif'),
+                  placeholder: const AssetImage('assets/loaders/bottle-loader.gif'),
                 ),
               ),
             ),
@@ -159,17 +158,13 @@ class _MovieItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(movie.title, style: textStyles.titleMedium),
-                  (movie.overview.length > 100)
-                      ? Text('${movie.overview.substring(0, 100)}...')
-                      : Text(movie.overview),
+                  (movie.overview.length > 100) ? Text('${movie.overview.substring(0, 100)}...') : Text(movie.overview),
                   Row(
                     children: [
-                      Icon(Icons.star_half_rounded,
-                          color: Colors.yellow.shade800),
+                      Icon(Icons.star_half_rounded, color: Colors.yellow.shade800),
                       const SizedBox(width: 5),
                       Text(HumanFormats.number(movie.voteAverage, 1),
-                          style: textStyles.bodyMedium
-                              ?.copyWith(color: Colors.yellow.shade900)),
+                          style: textStyles.bodyMedium?.copyWith(color: Colors.yellow.shade900)),
                     ],
                   )
                 ],

@@ -24,7 +24,7 @@ class CustomAppbar extends ConsumerWidget {
             children: [
               Icon(Icons.movie_outlined, color: colors.primary),
               const SizedBox(width: 5),
-              Text('Cinemapedia', style: titleStyle),
+              Text('Take-a-Movie', style: titleStyle),
               const Spacer(),
               IconButton(
                 onPressed: () {
@@ -36,9 +36,7 @@ class CustomAppbar extends ConsumerWidget {
                     context: context,
                     delegate: SearchMovieDelegate(
                       initialMovies: searchedMovies,
-                      searchMovies: ref
-                          .read(searchedMoviesProvider.notifier)
-                          .searchMoviesByQuery,
+                      searchMovies: ref.read(searchedMoviesProvider.notifier).searchMoviesByQuery,
                     ),
                   ).then((movie) {
                     if (movie == null || !context.mounted) return;
@@ -52,9 +50,7 @@ class CustomAppbar extends ConsumerWidget {
                 onPressed: () {
                   ref.read(themeNotifierProvider.notifier).toggleDarkMode();
                 },
-                icon: isDarkMode
-                    ? const Icon(Icons.dark_mode_outlined)
-                    : const Icon(Icons.light_mode_outlined),
+                icon: isDarkMode ? const Icon(Icons.dark_mode_outlined) : const Icon(Icons.light_mode_outlined),
               )
             ],
           ),
