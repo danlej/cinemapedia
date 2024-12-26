@@ -12,7 +12,30 @@ class HumanFormats {
   }
 
   static String shortDate(DateTime date) {
-    final format = DateFormat.yMMMEd('es');
+    final format = DateFormat.yMMMEd();
     return format.format(date);
+  }
+
+  static String today() {
+    final format = DateFormat.MMMEd();
+    return format.format(DateTime.now());
+  }
+
+  static String month(DateTime date) {
+    final format = DateFormat.MMMM();
+    return format.format(date);
+  }
+
+  static String currentMonth() {
+    return month(DateTime.now());
+  }
+
+  static String year(DateTime date) {
+    final format = DateFormat.y();
+    return format.format(date);
+  }
+
+  static String currentYear() {
+    return year(DateTime.now());
   }
 }

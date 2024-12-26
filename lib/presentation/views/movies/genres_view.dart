@@ -5,13 +5,6 @@ import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/movies/movie_masonry.dart';
 import 'package:cinemapedia/presentation/widgets/widgets.dart';
 
-final genreMoviesProvider = FutureProvider.family((ref, int genreId) {
-  final movieRepository = ref.watch(movieRepositoryProvider);
-  return movieRepository.getMoviesByGenreId(genreId);
-});
-
-final selectedGenreProvider = StateProvider<int>((ref) => 0);
-
 class GenresView extends ConsumerStatefulWidget {
   const GenresView({super.key});
 
@@ -19,45 +12,36 @@ class GenresView extends ConsumerStatefulWidget {
   GenresViewState createState() => GenresViewState();
 }
 
-class GenresViewState extends ConsumerState<GenresView>
-    with AutomaticKeepAliveClientMixin {
-  final ScrollController scrollController =
-      ScrollController(); // Controlador para el desplazamiento
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   ref.read(genresProvider.notifier).loadNextPage();
-  // }
+class GenresViewState extends ConsumerState<GenresView> with AutomaticKeepAliveClientMixin {
+  final ScrollController scrollController = ScrollController(); // Controlador para el desplazamiento
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    final genresFuture =
-        ref.read(genreRepositoryProvider).getOfficialGenresForMovies();
+    final genresState = ref.watch(genresProvider);
 
-    return FutureBuilder(
-      future: genresFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-        }
+    if (genresState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
 
-        if (snapshot.data == null || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No data recovery'));
-        }
+    if (genresState.genres.isEmpty) {
+      return const Center(
+        child: Text('No genres available'),
+      );
+    }
 
-        final genres = snapshot.data!;
-
-        return Column(
-          children: [
-            _GenreSelector(scrollController: scrollController, genres: genres),
-            const Expanded(child: _GenreMoviesView()),
-          ],
-        );
-      },
+    return Column(
+      children: [
+        _GenreSelector(
+          scrollController: scrollController,
+          genres: genresState.genres,
+          selectedGenre: genresState.selectedGenre,
+        ),
+        const Expanded(child: _GenreMoviesView()),
+      ],
     );
   }
 
@@ -70,20 +54,11 @@ class _GenreMoviesView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedGenreId = ref.watch(selectedGenreProvider);
-    final genreMoviesFuture = ref.watch(genreMoviesProvider(selectedGenreId));
+    final moviesGenreState = ref.watch(moviesGenreProvider);
 
-    return genreMoviesFuture.when(
-      data: (movies) => MovieMasonry(
-        movies: movies,
-        loadNextPage: () => ref.read(genresProvider.notifier).loadNextPage(),
-      ),
-      error: (_, __) => const Center(
-        child: Text('No se pudo cargar películas similares'),
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
+    return MovieMasonry(
+      movies: moviesGenreState.movies,
+      loadNextPage: ref.read(moviesGenreProvider.notifier).loadNextPage,
     );
   }
 }
@@ -91,22 +66,16 @@ class _GenreMoviesView extends ConsumerWidget {
 class _GenreSelector extends ConsumerWidget {
   final ScrollController scrollController;
   final List<Genre> genres;
+  final int selectedGenre;
 
   const _GenreSelector({
     required this.scrollController,
     required this.genres,
+    required this.selectedGenre,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedGenreId = ref.watch(selectedGenreProvider);
-
-    if (selectedGenreId == 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(selectedGenreProvider.notifier).state = genres.first.id;
-      });
-    }
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(top: 0),
@@ -123,7 +92,7 @@ class _GenreSelector extends ConsumerWidget {
                     itemCount: genres.length,
                     itemBuilder: (context, index) {
                       final genre = genres[index];
-                      bool isSelected = selectedGenreId == genre.id;
+                      bool isSelected = selectedGenre == genre.id;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -132,9 +101,7 @@ class _GenreSelector extends ConsumerWidget {
                             genre.name,
                             style: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           selected: isSelected,
@@ -146,9 +113,7 @@ class _GenreSelector extends ConsumerWidget {
                           ),
                           onSelected: (bool selected) {
                             if (selected) {
-                              ref
-                                  .read(selectedGenreProvider.notifier)
-                                  .update((state) => genre.id);
+                              ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
                             }
                           },
                         ),

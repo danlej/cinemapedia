@@ -3,6 +3,7 @@ export 'actors/actors_repository_provider.dart';
 export 'config/theme_provider.dart';
 export 'genres/genres_provider.dart';
 export 'genres/genres_repository_provider.dart';
+export 'genres/movies_genre_provider.dart';
 export 'movies/initial_loading_provider.dart';
 export 'movies/movie_info_provider.dart';
 export 'movies/movies_providers.dart';

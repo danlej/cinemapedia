@@ -43,15 +43,13 @@ class _Slide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final decoration = BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black45,
-            blurRadius: 10,
-            offset: Offset(0, 10),
-          )
-        ]);
+    final decoration = BoxDecoration(borderRadius: BorderRadius.circular(20), boxShadow: const [
+      BoxShadow(
+        color: Colors.black45,
+        blurRadius: 10,
+        offset: Offset(0, 10),
+      )
+    ]);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
@@ -63,8 +61,7 @@ class _Slide extends StatelessWidget {
               onTap: () => context.push('/home/0/movie/${movie.id}'),
               child: FadeInImage(
                 fit: BoxFit.cover,
-                placeholder:
-                    const AssetImage('assets/loaders/bottle-loader.gif'),
+                placeholder: const AssetImage('assets/loaders/bottle-loader.gif'),
                 image: NetworkImage(movie.backdropPath),
               ),
             )),

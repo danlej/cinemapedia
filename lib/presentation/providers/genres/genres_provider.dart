@@ -1,54 +1,59 @@
+import 'package:cinemapedia/domain/repositories/genres_repository.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
-import 'package:cinemapedia/presentation/views/movies/genres_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cinemapedia/domain/entities/entities.dart';
 
-final genresProvider =
-    StateNotifierProvider<GenreMapNotifier, Map<int, List<Movie>>>((ref) {
-  final getMovies = ref.watch(movieRepositoryProvider).getMoviesByGenreId;
-  final genreId = ref.watch(selectedGenreProvider);
+final genresProvider = StateNotifierProvider.autoDispose<GenresNotifier, GenresState>((ref) {
+  final genreRepository = ref.watch(genreRepositoryProvider);
 
-  return GenreMapNotifier(getMoviesByGenre: getMovies, genreId: genreId);
+  return GenresNotifier(genreRepository: genreRepository);
 });
 
-/*
-  {
-    12: List<Movie>
-    878: List<Movie>
-    1049: List<Movie>
+class GenresNotifier extends StateNotifier<GenresState> {
+  final GenresRepository genreRepository;
+
+  GenresNotifier({required this.genreRepository}) : super(GenresState()) {
+    loadGenres();
   }
 
- */
+  Future<void> updateSelectedGenre(int genre) async {
+    state = state.copyWith(
+      selectedGenre: genre,
+    );
+  }
 
-typedef GetMovieGenreCallback = Future<List<Movie>> Function(int genreId,
-    {int page});
+  Future<void> loadGenres() async {
+    final genres = await genreRepository.getOfficialGenresForMovies();
 
-class GenreMapNotifier extends StateNotifier<Map<int, List<Movie>>> {
-  int currentPage = 0;
-  bool isLoading = false;
-  int genreId;
-  GetMovieGenreCallback getMoviesByGenre;
-
-  GenreMapNotifier({required this.getMoviesByGenre, required this.genreId})
-      : super({});
-
-  Future<void> loadNextPage() async {
-    if (isLoading) return;
-    isLoading = true;
-    currentPage++;
-    final List<Movie> movies =
-        await getMoviesByGenre(genreId, page: currentPage);
-
-    if (state[genreId] == null) {
-      state = {...state, genreId: movies};
-      isLoading = false;
-      return;
+    if (genres.isNotEmpty) {
+      state = state.copyWith(
+        genres: genres,
+        selectedGenre: genres.first.id,
+        isLoading: false,
+      );
     }
-
-    state[genreId]!.addAll(movies);
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    isLoading = false;
   }
+}
+
+class GenresState {
+  final List<Genre> genres;
+  final int selectedGenre;
+  final bool isLoading;
+
+  GenresState({
+    this.genres = const [],
+    this.selectedGenre = 0,
+    this.isLoading = true,
+  });
+
+  GenresState copyWith({
+    List<Genre>? genres,
+    int? selectedGenre,
+    bool? isLoading,
+  }) =>
+      GenresState(
+        genres: genres ?? this.genres,
+        selectedGenre: selectedGenre ?? this.selectedGenre,
+        isLoading: isLoading ?? this.isLoading,
+      );
 }

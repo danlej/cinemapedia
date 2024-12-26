@@ -5,8 +5,7 @@ import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/presentation/widgets/widgets.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 
-final FutureProviderFamily<List<Video>, int> videosFromMovieProvider =
-    FutureProvider.family((ref, int movieId) {
+final FutureProviderFamily<List<Video>, int> videosFromMovieProvider = FutureProvider.family((ref, int movieId) {
   final movieRepository = ref.watch(movieRepositoryProvider);
   return movieRepository.getYoutubeVideosById(movieId);
 });
@@ -22,10 +21,8 @@ class VideosFromMovie extends ConsumerWidget {
 
     return moviesFromVideo.when(
       data: (videos) => _VideosList(videos: videos),
-      error: (_, __) =>
-          const Center(child: Text('No se pudo cargar películas similares')),
-      loading: () =>
-          const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      error: (_, __) => const Center(child: Text('No se pudo cargar películas similares')),
+      loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
 }
@@ -122,7 +119,7 @@ class _VideosListState extends State<_VideosList> {
           //             youtubeId: video.youtubeKey, name: video.name),)
 
           SizedBox(
-            height: 250,
+            height: size.width / 16 * 9 + 40,
             width: size.width,
             child: PageView.builder(
               controller: _pageViewController,
