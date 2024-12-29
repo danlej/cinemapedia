@@ -1,4 +1,5 @@
 import 'package:cinemapedia/config/constants/environment.dart';
+import 'package:cinemapedia/config/helpers/translator.dart';
 import 'package:cinemapedia/domain/datasources/persons_datasource.dart';
 import 'package:cinemapedia/domain/entities/person.dart';
 import 'package:cinemapedia/infrastructure/mappers/mappers.dart';
@@ -21,6 +22,11 @@ class PersonMoviedbDatasource extends PersonsDatasource {
     final personResponse = PersonResponse.fromJson(response.data);
 
     Person person = PersonMapper.castToEntity(personResponse);
+
+    if (person.alsoKnownAs.isNotEmpty) {
+      final alsoKnownAs = await Translator.translate(person.alsoKnownAs);
+      person = person.copyWith(alsoKnownAs: alsoKnownAs);
+    }
 
     return person;
   }

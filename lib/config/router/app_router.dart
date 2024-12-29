@@ -20,6 +20,14 @@ final appRouter = GoRouter(
             return MovieScreen(movieId: movieId);
           },
         ),
+        GoRoute(
+          path: 'biography/:id',
+          name: BiographyScreen.name,
+          builder: (context, state) {
+            final personId = state.pathParameters['id'] ?? 'no-id';
+            return BiographyScreen(personId: personId);
+          },
+        ),
       ],
     ),
     GoRoute(

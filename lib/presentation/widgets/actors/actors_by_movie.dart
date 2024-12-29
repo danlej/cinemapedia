@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:go_router/go_router.dart';
 
 class ActorsByMovie extends ConsumerWidget {
   final String movieId;
@@ -43,14 +44,16 @@ class ActorsByMovie extends ConsumerWidget {
                 FadeInRight(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: FadeInImage(
-                      height: 180,
-                      width: 135,
-                      fit: BoxFit.cover,
-                      placeholder:
-                          const AssetImage('assets/loaders/bottle-loader.gif'),
-                      image: NetworkImage(
-                        actor.profilePath,
+                    child: GestureDetector(
+                      onTap: () => context.push('/home/0/biography/${actor.id}'),
+                      child: FadeInImage(
+                        height: 180,
+                        width: 135,
+                        fit: BoxFit.cover,
+                        placeholder: const AssetImage('assets/loaders/bottle-loader.gif'),
+                        image: NetworkImage(
+                          actor.profilePath,
+                        ),
                       ),
                     ),
                   ),
@@ -60,9 +63,7 @@ class ActorsByMovie extends ConsumerWidget {
                 Text(
                   actor.character ?? '',
                   maxLines: 2,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.ellipsis),
+                  style: const TextStyle(fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                 )
               ],
             ),
