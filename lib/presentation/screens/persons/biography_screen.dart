@@ -1,8 +1,9 @@
+import 'package:cinemapedia/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
-import 'package:cinemapedia/presentation/providers/persons/persons_provider.dart';
+import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:cinemapedia/domain/entities/entities.dart';
 
 class BiographyScreen extends ConsumerStatefulWidget {
   static const name = 'biography';
@@ -22,11 +23,14 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
   void initState() {
     super.initState();
     ref.read(personsProvider.notifier).loadPerson(widget.personId);
+    ref.read(movieCreditsByPersonProvider.notifier).loadMovieCredits(widget.personId);
   }
 
   @override
   Widget build(BuildContext context) {
     final Person? person = ref.watch(personsProvider)[widget.personId];
+    final List<Movie>? movies = ref.watch(movieCreditsByPersonProvider)[widget.personId];
+
     final size = MediaQuery.of(context).size;
 
     if (person == null) {
@@ -37,30 +41,55 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    person.profilePath,
-                    width: size.width * 0.3,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      person.profilePath,
+                      width: size.width * 0.3,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                _BiographyDetails(person: person, size: size),
-              ],
-            ),
-            const SizedBox(height: 10),
-            SizedBox(height: 500, child: SingleChildScrollView(child: Text(person.biography))),
-          ],
+                  const SizedBox(width: 10),
+                  _BiographyDetails(person: person, size: size),
+                ],
+              ),
+              const SizedBox(height: 10),
+              if (person.biography.isNotEmpty)
+                SizedBox(height: 180, child: SingleChildScrollView(child: SizedBox(child: Text(person.biography)))),
+              _KnownForMovies(movies: movies),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _KnownForMovies extends StatelessWidget {
+  final List<Movie>? movies;
+
+  const _KnownForMovies({required this.movies});
+
+  @override
+  Widget build(BuildContext context) {
+    if (movies == null) return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+
+    if (movies!.isEmpty) return const SizedBox();
+
+    return Container(
+      margin: const EdgeInsetsDirectional.only(bottom: 10),
+      child: MovieHorizontalListview(title: 'Known For', movies: movies!),
     );
   }
 }
@@ -89,7 +118,8 @@ class _BiographyDetails extends StatelessWidget {
                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
               ),
               const Spacer(),
-              if (person.birthday != null) Text('${HumanFormats.howOld(person.birthday!)} yo'),
+              if (person.birthday != null && person.deathday == null)
+                Text('${HumanFormats.howOld(person.birthday!)} yo'),
             ],
           ),
           const SizedBox(height: 8),

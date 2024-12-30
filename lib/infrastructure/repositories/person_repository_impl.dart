@@ -1,5 +1,5 @@
+import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/domain/datasources/persons_datasource.dart';
-import 'package:cinemapedia/domain/entities/person.dart';
 import 'package:cinemapedia/domain/repositories/person_repository.dart';
 
 class PersonRepositoryImpl extends PersonRepository {
@@ -10,5 +10,10 @@ class PersonRepositoryImpl extends PersonRepository {
   @override
   Future<Person> getPersonById(String personId) async {
     return datasource.getPersonById(personId);
+  }
+
+  @override
+  Future<List<Movie>> getMovieCreditsByPersonId(String personId) {
+    return datasource.getMovieCreditsByPersonId(personId);
   }
 }

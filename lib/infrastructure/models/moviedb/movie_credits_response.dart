@@ -1,20 +1,49 @@
-class MovieMovieDB {
+class MovieCreditsResponse {
+  final List<MovieCreditDB> cast;
+  final List<MovieCreditDB> crew;
+  final int id;
+
+  MovieCreditsResponse({
+    required this.cast,
+    required this.crew,
+    required this.id,
+  });
+
+  factory MovieCreditsResponse.fromJson(Map<String, dynamic> json) => MovieCreditsResponse(
+        cast: List<MovieCreditDB>.from(json["cast"].map((x) => MovieCreditDB.fromJson(x))),
+        crew: List<MovieCreditDB>.from(json["crew"].map((x) => MovieCreditDB.fromJson(x))),
+        id: json["id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "cast": List<dynamic>.from(cast.map((x) => x.toJson())),
+        "crew": List<dynamic>.from(crew.map((x) => x.toJson())),
+        "id": id,
+      };
+}
+
+class MovieCreditDB {
   final bool adult;
-  final String backdropPath;
+  final String? backdropPath;
   final List<int> genreIds;
   final int id;
   final String originalLanguage;
   final String originalTitle;
   final String overview;
   final double popularity;
-  final String posterPath;
+  final String? posterPath;
   final DateTime? releaseDate;
   final String title;
   final bool video;
   final double voteAverage;
   final int voteCount;
+  final String? character;
+  final String creditId;
+  final int? order;
+  final String? department;
+  final String? job;
 
-  MovieMovieDB({
+  MovieCreditDB({
     required this.adult,
     required this.backdropPath,
     required this.genreIds,
@@ -29,16 +58,21 @@ class MovieMovieDB {
     required this.video,
     required this.voteAverage,
     required this.voteCount,
+    this.character,
+    required this.creditId,
+    this.order,
+    this.department,
+    this.job,
   });
 
-  factory MovieMovieDB.fromJson(Map<String, dynamic> json) => MovieMovieDB(
+  factory MovieCreditDB.fromJson(Map<String, dynamic> json) => MovieCreditDB(
         adult: json["adult"] ?? false,
         backdropPath: json["backdrop_path"] ?? '',
         genreIds: List<int>.from(json["genre_ids"].map((x) => x)),
         id: json["id"],
         originalLanguage: json["original_language"],
         originalTitle: json["original_title"],
-        overview: json["overview"] ?? '',
+        overview: json["overview"] = '',
         popularity: json["popularity"]?.toDouble(),
         posterPath: json["poster_path"] ?? '',
         releaseDate: json["release_date"] != null && json["release_date"].toString().isNotEmpty
@@ -48,6 +82,11 @@ class MovieMovieDB {
         video: json["video"],
         voteAverage: json["vote_average"]?.toDouble(),
         voteCount: json["vote_count"],
+        character: json["character"],
+        creditId: json["credit_id"],
+        order: json["order"],
+        department: json["department"],
+        job: json["job"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,12 +99,15 @@ class MovieMovieDB {
         "overview": overview,
         "popularity": popularity,
         "poster_path": posterPath,
-        "release_date": (releaseDate != null)
-            ? "${releaseDate!.year.toString().padLeft(4, '0')}-${releaseDate!.month.toString().padLeft(2, '0')}-${releaseDate!.day.toString().padLeft(2, '0')}"
-            : null,
+        "release_date": releaseDate,
         "title": title,
         "video": video,
         "vote_average": voteAverage,
         "vote_count": voteCount,
+        "character": character,
+        "credit_id": creditId,
+        "order": order,
+        "department": department,
+        "job": job,
       };
 }

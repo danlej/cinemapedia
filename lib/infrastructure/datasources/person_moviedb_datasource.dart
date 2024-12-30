@@ -1,10 +1,10 @@
-import 'package:cinemapedia/config/constants/environment.dart';
-import 'package:cinemapedia/config/helpers/translator.dart';
-import 'package:cinemapedia/domain/datasources/persons_datasource.dart';
-import 'package:cinemapedia/domain/entities/person.dart';
-import 'package:cinemapedia/infrastructure/mappers/mappers.dart';
-import 'package:cinemapedia/infrastructure/models/models.dart';
 import 'package:dio/dio.dart';
+import 'package:cinemapedia/domain/entities/entities.dart';
+import 'package:cinemapedia/config/helpers/translator.dart';
+import 'package:cinemapedia/infrastructure/models/models.dart';
+import 'package:cinemapedia/infrastructure/mappers/mappers.dart';
+import 'package:cinemapedia/config/constants/environment.dart';
+import 'package:cinemapedia/domain/datasources/persons_datasource.dart';
 
 class PersonMoviedbDatasource extends PersonsDatasource {
   final dio = Dio(BaseOptions(
@@ -29,5 +29,17 @@ class PersonMoviedbDatasource extends PersonsDatasource {
     }
 
     return person;
+  }
+
+  @override
+  Future<List<Movie>> getMovieCreditsByPersonId(String personId) async {
+    final response = await dio.get('/person/$personId/movie_credits');
+
+    final movieCreditsResponse = MovieCreditsResponse.fromJson(response.data);
+
+    List<MovieCredit> movieCredits =
+        movieCreditsResponse.cast.map((e) => MovieMapper.movieCreditDBToEntity(e)).toList();
+
+    return movieCredits.map((e) => MovieMapper.movieCreditToMovie(e)).toList();
   }
 }
