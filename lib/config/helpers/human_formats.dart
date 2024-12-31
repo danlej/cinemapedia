@@ -39,8 +39,8 @@ class HumanFormats {
     return year(DateTime.now());
   }
 
-  static int howOld(DateTime birthday) {
-    final currentDate = DateTime.now();
+  static int howOld(DateTime birthday, DateTime? deathday) {
+    final currentDate = deathday ?? DateTime.now();
 
     int age = currentDate.year - birthday.year;
 

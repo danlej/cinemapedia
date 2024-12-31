@@ -33,7 +33,7 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
 
     final size = MediaQuery.of(context).size;
 
-    if (person == null) {
+    if (person == null || movies == null) {
       return const Scaffold(
           body: Center(
         child: CircularProgressIndicator(strokeWidth: 2),
@@ -47,26 +47,20 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Column(
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      person.profilePath,
-                      width: size.width * 0.3,
-                    ),
-                  ),
+                  _BiographyImage(image: person.profilePath, size: size),
                   const SizedBox(width: 10),
                   _BiographyDetails(person: person, size: size),
                 ],
               ),
-              const SizedBox(height: 10),
-              if (person.biography.isNotEmpty)
-                SizedBox(height: 180, child: SingleChildScrollView(child: SizedBox(child: Text(person.biography)))),
+              const SizedBox(height: 15),
+              _BiographyDescription(content: person.biography),
+              const SizedBox(height: 15),
               _KnownForMovies(movies: movies),
             ],
           ),
@@ -94,6 +88,70 @@ class _KnownForMovies extends StatelessWidget {
   }
 }
 
+class _BiographyDescription extends StatelessWidget {
+  final String content;
+
+  const _BiographyDescription({required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    if (content.isEmpty) return const SizedBox();
+
+    return Stack(children: [
+      Container(
+        constraints: const BoxConstraints(maxHeight: 180),
+        child: SingleChildScrollView(
+          child: SizedBox(
+            child: Text(content),
+          ),
+        ),
+      ),
+      // Positioned(
+      //   right: 2,
+      //   bottom: 2,
+      //   child: IconButton(
+      //     onPressed: () {},
+      //     icon: const Icon(Icons.arrow_drop_down),
+      //     style: const ButtonStyle(
+      //       iconColor: WidgetStatePropertyAll(Colors.white),
+      //       iconSize: WidgetStatePropertyAll(35),
+      //     ),
+      //   ),
+      // ),
+      // Positioned(
+      //   right: 2,
+      //   top: 2,
+      //   child: IconButton(
+      //     onPressed: () {},
+      //     icon: const Icon(Icons.arrow_drop_up),
+      //     style: const ButtonStyle(
+      //       iconColor: WidgetStatePropertyAll(Colors.white),
+      //       iconSize: WidgetStatePropertyAll(35),
+      //     ),
+      //   ),
+      // ),
+    ]);
+  }
+}
+
+class _BiographyImage extends StatelessWidget {
+  final String image;
+  final Size size;
+
+  const _BiographyImage({required this.image, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image.network(
+        image,
+        width: size.width * 0.3,
+      ),
+    );
+  }
+}
+
 class _BiographyDetails extends StatelessWidget {
   final Person person;
   final Size size;
@@ -103,7 +161,7 @@ class _BiographyDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: (size.width - 45) * 0.7,
+      width: (size.width - 50) * 0.7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,12 +172,9 @@ class _BiographyDetails extends StatelessWidget {
           Row(
             children: [
               Text(
-                person.alsoKnownAs,
+                '${person.alsoKnownAs} ${person.birthday != null ? '(${HumanFormats.howOld(person.birthday!, person.deathday)} years old)' : ''}',
                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
               ),
-              const Spacer(),
-              if (person.birthday != null && person.deathday == null)
-                Text('${HumanFormats.howOld(person.birthday!)} yo'),
             ],
           ),
           const SizedBox(height: 8),

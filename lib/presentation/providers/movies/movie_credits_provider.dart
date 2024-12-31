@@ -1,7 +1,7 @@
 import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'persons_repository_provider.dart';
+import '../persons/persons_repository_provider.dart';
 
 final movieCreditsByPersonProvider =
     StateNotifierProvider<MovieCreditsByPersonNotifier, Map<String, List<Movie>>>((ref) {

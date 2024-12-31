@@ -26,7 +26,7 @@ class MoviesGenreNotifier extends StateNotifier<MoviesGenreState> {
 
   Future<void> reset() async {
     state = state.copyWith(
-      currentPage: 1,
+      currentPage: 0,
       isLoading: false,
       isLastPage: false,
       movies: const [],
@@ -37,6 +37,7 @@ class MoviesGenreNotifier extends StateNotifier<MoviesGenreState> {
     if (state.isLoading || state.isLastPage || !mounted) return;
 
     state = state.copyWith(
+      currentPage: state.currentPage + 1,
       isLoading: true,
     );
 
@@ -53,7 +54,7 @@ class MoviesGenreNotifier extends StateNotifier<MoviesGenreState> {
     state = state.copyWith(
       isLoading: false,
       isLastPage: false,
-      currentPage: state.currentPage + 1,
+      currentPage: state.currentPage,
       movies: [...state.movies, ...movies],
     );
   }
@@ -66,7 +67,7 @@ class MoviesGenreState {
   final List<Movie> movies;
 
   MoviesGenreState({
-    this.currentPage = 1,
+    this.currentPage = 0,
     this.isLoading = false,
     this.isLastPage = false,
     this.movies = const [],

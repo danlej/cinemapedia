@@ -5,7 +5,7 @@ class PersonMapper {
   static Person castToEntity(PersonResponse personResponse) => Person(
         id: personResponse.id,
         name: personResponse.name,
-        alsoKnownAs: personResponse.alsoKnownAs.isNotEmpty ? personResponse.alsoKnownAs.first : '',
+        alsoKnownAs: personResponse.alsoKnownAs.isNotEmpty ? personResponse.alsoKnownAs.first : personResponse.name,
         birthday: personResponse.birthday,
         deathday: personResponse.deathday,
         placeOfBirth: personResponse.placeOfBirth,

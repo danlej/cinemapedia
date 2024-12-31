@@ -19,8 +19,7 @@ class MovieHorizontalListview extends StatefulWidget {
   });
 
   @override
-  State<MovieHorizontalListview> createState() =>
-      _MovieHorizontalListviewState();
+  State<MovieHorizontalListview> createState() => _MovieHorizontalListviewState();
 }
 
 class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
@@ -33,8 +32,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
     scrollController.addListener(() {
       if (widget.loadNextPage == null) return;
 
-      if ((scrollController.position.pixels + 200) >=
-          scrollController.position.maxScrollExtent) {
+      if ((scrollController.position.pixels + 200) >= scrollController.position.maxScrollExtent) {
         widget.loadNextPage!();
       }
     });
@@ -52,8 +50,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
       height: 350,
       child: Column(
         children: [
-          if (widget.title != null || widget.subTitle != null)
-            _Title(title: widget.title, subTitle: widget.subTitle),
+          if (widget.title != null || widget.subTitle != null) _Title(title: widget.title, subTitle: widget.subTitle),
           Expanded(
             child: ListView.builder(
               controller: scrollController,
@@ -95,8 +92,7 @@ class _Slide extends StatelessWidget {
                 child: FadeInImage(
                   height: 220,
                   fit: BoxFit.cover,
-                  placeholder:
-                      const AssetImage('assets/loaders/bottle-loader.gif'),
+                  placeholder: const AssetImage('assets/loaders/bottle-loader.gif'),
                   image: NetworkImage(movie.posterPath),
                 ),
               ),
