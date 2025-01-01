@@ -6,30 +6,49 @@ import 'package:cinemapedia/domain/repositories/movies_repository.dart';
 final moviesGenreProvider = StateNotifierProvider.autoDispose<MoviesGenreNotifier, MoviesGenreState>((ref) {
   final movieRepository = ref.watch(movieRepositoryProvider);
   final selectedGenre = ref.watch(genresProvider).selectedGenre;
+  final moviesGenreState = ref.read(genresTabProvider)[selectedGenre];
 
   return MoviesGenreNotifier(
     moviesRepository: movieRepository,
     selectedGenre: selectedGenre,
+    moviesGenreState: moviesGenreState,
   );
 });
 
 class MoviesGenreNotifier extends StateNotifier<MoviesGenreState> {
   final MoviesRepository moviesRepository;
   final int selectedGenre;
+  final MoviesGenreState? moviesGenreState;
 
   MoviesGenreNotifier({
     required this.moviesRepository,
     required this.selectedGenre,
+    this.moviesGenreState,
   }) : super(MoviesGenreState()) {
-    loadNextPage();
+    if (moviesGenreState == null) {
+      loadNextPage();
+      return;
+    }
+
+    reset(moviesGenreState);
   }
 
-  Future<void> reset() async {
+  Future<void> reset(MoviesGenreState? moviesGenreState) async {
+    if (moviesGenreState == null) {
+      state = state.copyWith(
+        currentPage: 0,
+        isLoading: false,
+        isLastPage: false,
+        movies: const [],
+      );
+      return;
+    }
+
     state = state.copyWith(
-      currentPage: 0,
-      isLoading: false,
-      isLastPage: false,
-      movies: const [],
+      currentPage: moviesGenreState.currentPage,
+      isLoading: moviesGenreState.isLoading,
+      isLastPage: moviesGenreState.isLastPage,
+      movies: moviesGenreState.movies,
     );
   }
 

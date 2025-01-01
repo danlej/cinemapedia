@@ -113,6 +113,11 @@ class _GenreSelector extends ConsumerWidget {
                           ),
                           onSelected: (bool selected) {
                             if (selected) {
+                              final key = ref.read(genresProvider).selectedGenre;
+                              final value = ref.read(moviesGenreProvider);
+
+                              ref.read(genresTabProvider.notifier).update(key, value);
+
                               ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
                             }
                           },
