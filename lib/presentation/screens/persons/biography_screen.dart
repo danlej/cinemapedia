@@ -160,6 +160,8 @@ class _BiographyDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyles = Theme.of(context).textTheme;
+
     return SizedBox(
       width: (size.width - 50) * 0.7,
       child: Column(
@@ -169,13 +171,15 @@ class _BiographyDetails extends StatelessWidget {
             person.name,
             style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          Row(
-            children: [
-              Text(
-                '${person.alsoKnownAs} ${person.birthday != null ? '(${HumanFormats.howOld(person.birthday!, person.deathday)} years old)' : ''}',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
-              ),
-            ],
+          RichText(
+            text: TextSpan(
+                text:
+                    '${person.alsoKnownAs} ${person.birthday != null ? '(${HumanFormats.howOld(person.birthday!, person.deathday)} years old)' : ''}',
+                style: textStyles.titleMedium?.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w300,
+                  fontStyle: FontStyle.italic,
+                )),
           ),
           const SizedBox(height: 8),
           if (person.birthday != null)
@@ -233,11 +237,17 @@ class BiographyItem extends StatelessWidget {
         ? RichText(
             text: TextSpan(
               text: label,
-              style: textStyles.labelLarge?.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+              style: textStyles.titleMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               children: <TextSpan>[
                 TextSpan(
                   text: content,
-                  style: textStyles.titleSmall?.copyWith(fontSize: 13, fontWeight: FontWeight.w300),
+                  style: textStyles.titleSmall?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ],
             ),
