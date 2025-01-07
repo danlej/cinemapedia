@@ -11,8 +11,7 @@ class FavoritesView extends ConsumerStatefulWidget {
   FavoritesViewState createState() => FavoritesViewState();
 }
 
-class FavoritesViewState extends ConsumerState<FavoritesView>
-    with AutomaticKeepAliveClientMixin {
+class FavoritesViewState extends ConsumerState<FavoritesView> with AutomaticKeepAliveClientMixin {
   bool isLastPage = false;
   bool isLoading = false;
 
@@ -26,8 +25,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView>
     if (isLoading || isLastPage) return;
     isLoading = true;
 
-    final movies =
-        await ref.read(favoriteMoviesProvider.notifier).loadNextPage();
+    final movies = await ref.read(favoriteMoviesProvider.notifier).loadNextPage();
     isLoading = false;
 
     if (movies.isEmpty) {
@@ -54,14 +52,10 @@ class FavoritesViewState extends ConsumerState<FavoritesView>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(Icons.favorite_outline_sharp, size: 60, color: colors.primary),
-            Text('Ohhh no!!',
-                style: TextStyle(fontSize: 30, color: colors.primary)),
-            const Text('No tienes películas favoritas',
-                style: TextStyle(fontSize: 20, color: Colors.black45)),
+            Text('Ohhh no!!', style: TextStyle(fontSize: 30, color: colors.primary)),
+            Text('No tienes películas favoritas', style: TextStyle(fontSize: 20, color: colors.secondary)),
             const SizedBox(height: 20),
-            FilledButton.tonal(
-                onPressed: () => context.go('/home/0'),
-                child: const Text('Empieza a buscar'))
+            FilledButton.tonal(onPressed: () => context.go('/home/0'), child: const Text('Empieza a buscar'))
           ],
         ),
       );

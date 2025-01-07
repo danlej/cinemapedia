@@ -95,7 +95,7 @@ class _GenreSelector extends ConsumerWidget {
                       bool isSelected = selectedGenre == genre.id;
 
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: ChoiceChip(
                           label: Text(
                             genre.name,
@@ -107,9 +107,10 @@ class _GenreSelector extends ConsumerWidget {
                           selected: isSelected,
                           selectedColor: Colors.white,
                           showCheckmark: false,
+                          side: BorderSide(style: BorderStyle.solid, color: Colors.grey.shade800),
                           backgroundColor: Colors.grey.shade800,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           onSelected: (bool selected) {
                             if (selected) {
