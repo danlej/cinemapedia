@@ -1,4 +1,5 @@
 export 'actor.dart';
+export 'external_ids.dart';
 export 'genre.dart';
 export 'movie_credit.dart';
 export 'movie.dart';

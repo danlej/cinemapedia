@@ -5,6 +5,7 @@ import 'package:cinemapedia/infrastructure/models/models.dart';
 import 'package:cinemapedia/infrastructure/mappers/mappers.dart';
 import 'package:cinemapedia/config/constants/environment.dart';
 import 'package:cinemapedia/domain/datasources/persons_datasource.dart';
+import 'package:cinemapedia/infrastructure/mappers/external_ids_mapper.dart';
 
 class PersonMoviedbDatasource extends PersonsDatasource {
   final dio = Dio(BaseOptions(
@@ -41,5 +42,14 @@ class PersonMoviedbDatasource extends PersonsDatasource {
         movieCreditsResponse.cast.map((e) => MovieMapper.movieCreditDBToEntity(e)).toList();
 
     return movieCredits.map((e) => MovieMapper.movieCreditToMovie(e)).toList();
+  }
+
+  @override
+  Future<ExternalIds> getExternalIdsByPersonId(String personId) async {
+    final response = await dio.get('/person/$personId/external_ids');
+
+    final externalIdsResponse = ExternalIdsResponse.fromJson(response.data);
+
+    return ExternalIdsMapper.externalIdsToEntity(externalIdsResponse);
   }
 }

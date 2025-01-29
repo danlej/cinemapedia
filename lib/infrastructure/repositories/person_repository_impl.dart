@@ -16,4 +16,9 @@ class PersonRepositoryImpl extends PersonRepository {
   Future<List<Movie>> getMovieCreditsByPersonId(String personId) {
     return datasource.getMovieCreditsByPersonId(personId);
   }
+
+  @override
+  Future<ExternalIds> getExternalIdsByPersonId(String personId) {
+    return datasource.getExternalIdsByPersonId(personId);
+  }
 }

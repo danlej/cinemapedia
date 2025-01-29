@@ -1,4 +1,5 @@
 export 'moviedb/credits_response.dart';
+export 'moviedb/external_ids_response.dart';
 export 'moviedb/genres_response.dart';
 export 'moviedb/movie_credits_response.dart';
 export 'moviedb/movie_details.dart';

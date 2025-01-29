@@ -1,9 +1,11 @@
+import 'package:cinemapedia/presentation/providers/persons/external_ids_provider.dart';
 import 'package:cinemapedia/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/domain/entities/entities.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BiographyScreen extends ConsumerStatefulWidget {
   static const name = 'biography';
@@ -23,6 +25,7 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
   void initState() {
     super.initState();
     ref.read(personsProvider.notifier).loadPerson(widget.personId);
+    ref.read(externalIdsProvider.notifier).loadExternalIds(widget.personId);
     ref.read(movieCreditsByPersonProvider.notifier).loadMovieCredits(widget.personId);
   }
 
@@ -30,6 +33,7 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
   Widget build(BuildContext context) {
     final Person? person = ref.watch(personsProvider)[widget.personId];
     final List<Movie>? movies = ref.watch(movieCreditsByPersonProvider)[widget.personId];
+    final ExternalIds? externalIds = ref.watch(externalIdsProvider)[widget.personId];
 
     final size = MediaQuery.of(context).size;
 
@@ -55,7 +59,7 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
                 children: [
                   _BiographyImage(image: person.profilePath, size: size),
                   const SizedBox(width: 10),
-                  _BiographyDetails(person: person, size: size),
+                  _BiographyDetails(person: person, size: size, externalIds: externalIds),
                 ],
               ),
               const SizedBox(height: 15),
@@ -154,9 +158,10 @@ class _BiographyImage extends StatelessWidget {
 
 class _BiographyDetails extends StatelessWidget {
   final Person person;
+  final ExternalIds? externalIds;
   final Size size;
 
-  const _BiographyDetails({required this.person, required this.size});
+  const _BiographyDetails({required this.person, required this.size, required this.externalIds});
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +172,20 @@ class _BiographyDetails extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            person.name,
-            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          RichText(
+            text: TextSpan(
+              text: '${person.name} ',
+              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              children: [
+                if (externalIds?.instagramId != null && externalIds!.instagramId!.isNotEmpty)
+                  WidgetSpan(
+                    child: InstagramButton(username: externalIds!.instagramId!),
+                    alignment: PlaceholderAlignment.middle,
+                  ),
+              ],
+            ),
           ),
+          const SizedBox(height: 2),
           RichText(
             text: TextSpan(
                 text:
@@ -199,12 +214,12 @@ class _BiographyDetails extends StatelessWidget {
             content: person.placeOfBirth,
             condition: person.placeOfBirth.isNotEmpty,
           ),
-          const SizedBox(height: 3),
-          BiographyItem(
-            label: 'Department: ',
-            content: person.knownForDepartment,
-            condition: person.knownForDepartment.isNotEmpty,
-          ),
+          // const SizedBox(height: 3),
+          // BiographyItem(
+          //   label: 'Department: ',
+          //   content: person.knownForDepartment,
+          //   condition: person.knownForDepartment.isNotEmpty,
+          // ),
           const SizedBox(height: 3),
           BiographyItem(
             label: 'Homepage: ',
@@ -253,5 +268,46 @@ class BiographyItem extends StatelessWidget {
             ),
           )
         : Container();
+  }
+}
+
+class InstagramButton extends StatelessWidget {
+  final String username;
+
+  const InstagramButton({super.key, required this.username});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: openInstagram,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          width: 32,
+          height: 32,
+          child: Image.asset(
+            'assets/images/instagram-logo.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> openInstagram() async {
+    final Uri appUrl = Uri.parse('instagram://user?username=$username');
+    final Uri webUrl = Uri.parse('https://www.instagram.com/$username/');
+
+    try {
+      // Intenta abrir la app de Instagram.
+      if (!await launchUrl(appUrl, mode: LaunchMode.externalApplication)) {
+        // Si falla, abre el perfil en el navegador.
+        if (!await launchUrl(webUrl, mode: LaunchMode.externalApplication)) {
+          throw 'No se pudo abrir Instagram.';
+        }
+      }
+    } catch (e) {
+      debugPrint('Error al abrir Instagram: $e');
+    }
   }
 }
