@@ -27,6 +27,9 @@ class ActorsByMovie extends ConsumerWidget {
 
     final actors = actorsByMovie[movieId]!;
 
+    //* Nada que mostrar
+    if (actors.isEmpty) return const SizedBox();
+
     return SizedBox(
       height: 300,
       child: ListView.builder(

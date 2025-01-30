@@ -1,11 +1,14 @@
-import 'package:cinemapedia/presentation/providers/persons/external_ids_provider.dart';
-import 'package:cinemapedia/presentation/widgets/widgets.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cinemapedia/presentation/widgets/widgets.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:cinemapedia/presentation/providers/persons/external_ids_provider.dart';
 import 'package:cinemapedia/domain/entities/entities.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BiographyScreen extends ConsumerStatefulWidget {
   static const name = 'biography';
@@ -57,14 +60,22 @@ class BiographyScreenState extends ConsumerState<BiographyScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _BiographyImage(image: person.profilePath, size: size),
+                  Column(
+                    children: [
+                      _BiographyImage(imagePath: person.profilePath, size: size),
+                      if (externalIds != null)
+                        SocialMediaButtons(
+                          externalIds: externalIds,
+                        )
+                    ],
+                  ),
                   const SizedBox(width: 10),
-                  _BiographyDetails(person: person, size: size, externalIds: externalIds),
+                  _BiographyDetails(person: person, size: size),
                 ],
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               _BiographyDescription(content: person.biography),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               _KnownForMovies(movies: movies),
             ],
           ),
@@ -139,29 +150,97 @@ class _BiographyDescription extends StatelessWidget {
 }
 
 class _BiographyImage extends StatelessWidget {
-  final String image;
+  final String imagePath;
   final Size size;
 
-  const _BiographyImage({required this.image, required this.size});
+  const _BiographyImage({required this.imagePath, required this.size});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Image.network(
-        image,
-        width: size.width * 0.3,
+    Image image = Image.network(imagePath, fit: BoxFit.cover);
+
+    return GestureDetector(
+      onTap: () => showImageDialog(context, image),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black,
+              offset: Offset(1.0, 1.0),
+              blurRadius: 2.0,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: SizedBox(
+            width: size.width * 0.3,
+            child: image,
+          ),
+        ),
       ),
+    );
+  }
+
+  void showImageDialog(BuildContext context, Image image) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Stack(
+          children: [
+            // Blur effect in the background
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Ajusta el nivel de desenfoque
+              child: Container(
+                color: Colors.black.withAlpha(128), // Un ligero fondo semitransparente
+              ),
+            ),
+            // Image
+            Center(
+              child: Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: image,
+                      ),
+                      Positioned(
+                        top: 1,
+                        right: 1,
+                        child: IconButton(
+                          onPressed: () => context.pop(),
+                          color: Colors.white,
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _BiographyDetails extends StatelessWidget {
   final Person person;
-  final ExternalIds? externalIds;
   final Size size;
 
-  const _BiographyDetails({required this.person, required this.size, required this.externalIds});
+  const _BiographyDetails({required this.person, required this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -174,18 +253,13 @@ class _BiographyDetails extends StatelessWidget {
         children: [
           RichText(
             text: TextSpan(
-              text: '${person.name} ',
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-              children: [
-                if (externalIds?.instagramId != null && externalIds!.instagramId!.isNotEmpty)
-                  WidgetSpan(
-                    child: InstagramButton(username: externalIds!.instagramId!),
-                    alignment: PlaceholderAlignment.middle,
-                  ),
-              ],
-            ),
+                text: '${person.name} ',
+                style: textStyles.titleLarge?.copyWith(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                )),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           RichText(
             text: TextSpan(
                 text:
@@ -208,18 +282,12 @@ class _BiographyDetails extends StatelessWidget {
               label: 'Deathday: ',
               content: HumanFormats.shortDate(person.deathday!),
             ),
-          const SizedBox(height: 3),
+          if (person.deathday != null) const SizedBox(height: 3),
           BiographyItem(
             label: 'Place of Birth: ',
             content: person.placeOfBirth,
             condition: person.placeOfBirth.isNotEmpty,
           ),
-          // const SizedBox(height: 3),
-          // BiographyItem(
-          //   label: 'Department: ',
-          //   content: person.knownForDepartment,
-          //   condition: person.knownForDepartment.isNotEmpty,
-          // ),
           const SizedBox(height: 3),
           BiographyItem(
             label: 'Homepage: ',
@@ -271,32 +339,53 @@ class BiographyItem extends StatelessWidget {
   }
 }
 
-class InstagramButton extends StatelessWidget {
-  final String username;
+class SocialMediaButtons extends StatelessWidget {
+  final ExternalIds externalIds;
 
-  const InstagramButton({super.key, required this.username});
+  const SocialMediaButtons({super.key, required this.externalIds});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: openInstagram,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: SizedBox(
-          width: 32,
-          height: 32,
-          child: Image.asset(
-            'assets/images/instagram-logo.png',
-            fit: BoxFit.cover,
+    return Row(
+      spacing: 13,
+      children: [
+        if (externalIds.instagramId != null && externalIds.instagramId!.isNotEmpty)
+          InkWell(
+            onTap: openInstagram,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 35,
+                height: 35,
+                child: Image.asset(
+                  'assets/images/instagram.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        if (externalIds.facebookId != null && externalIds.facebookId!.isNotEmpty)
+          InkWell(
+            onTap: openFacebook,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 35,
+                height: 35,
+                child: Image.asset(
+                  'assets/images/facebook.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          )
+      ],
     );
   }
 
   Future<void> openInstagram() async {
-    final Uri appUrl = Uri.parse('instagram://user?username=$username');
-    final Uri webUrl = Uri.parse('https://www.instagram.com/$username/');
+    final Uri appUrl = Uri.parse('instagram://user?username=${externalIds.instagramId}');
+    final Uri webUrl = Uri.parse('https://www.instagram.com/${externalIds.instagramId}/');
 
     try {
       // Intenta abrir la app de Instagram.
@@ -308,6 +397,26 @@ class InstagramButton extends StatelessWidget {
       }
     } catch (e) {
       debugPrint('Error al abrir Instagram: $e');
+    }
+  }
+
+  Future<void> openFacebook() async {
+    // Detecta si es un ID numérico (probable página) o un nombre de usuario (perfil)
+    final bool isPage = RegExp(r'^\d+$').hasMatch(externalIds.facebookId!);
+
+    final Uri? appUrl = isPage ? Uri.parse('fb://page/${externalIds.facebookId}') : null;
+    final Uri webUrl = Uri.parse('https://www.facebook.com/${externalIds.facebookId}/');
+
+    try {
+      if (appUrl != null && await canLaunchUrl(appUrl)) {
+        // Si es una página y la app de Facebook puede manejarlo, abre la app
+        await launchUrl(appUrl, mode: LaunchMode.externalApplication);
+      } else {
+        // Si es un perfil o la app no puede abrirlo, abre en el navegador
+        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Error al abrir Facebook: $e');
     }
   }
 }

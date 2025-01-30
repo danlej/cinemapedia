@@ -21,7 +21,7 @@ class VideosFromMovie extends ConsumerWidget {
 
     return moviesFromVideo.when(
       data: (videos) => _VideosList(videos: videos),
-      error: (_, __) => const Center(child: Text('No se pudo cargar películas similares')),
+      error: (_, __) => const Center(child: Text('No se pudo cargar videos')),
       loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
