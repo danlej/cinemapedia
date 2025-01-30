@@ -76,9 +76,11 @@ class _GenreSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(top: 0),
+        padding: const EdgeInsets.only(top: 5),
         child: SizedBox(
           height: 50,
           child: Stack(
@@ -94,34 +96,43 @@ class _GenreSelector extends ConsumerWidget {
                       final genre = genres[index];
                       bool isSelected = selectedGenre == genre.id;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: ChoiceChip(
-                          label: Text(
-                            genre.name,
-                            style: TextStyle(
-                              color: isSelected ? Colors.black : Colors.white,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      return Container(
+                        color: isDark ? Colors.black : Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: ChoiceChip(
+                            label: Text(
+                              genre.name,
+                              style: TextStyle(
+                                color: isDark
+                                    ? (isSelected ? Colors.black : Colors.white)
+                                    : (isSelected ? Colors.white : Colors.black),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          selected: isSelected,
-                          selectedColor: Colors.white,
-                          showCheckmark: false,
-                          side: BorderSide(style: BorderStyle.solid, color: Colors.grey.shade800),
-                          backgroundColor: Colors.grey.shade800,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          onSelected: (bool selected) {
-                            if (selected) {
-                              final key = ref.read(genresProvider).selectedGenre;
-                              final value = ref.read(moviesGenreProvider);
+                            visualDensity: isSelected ? VisualDensity.comfortable : VisualDensity.compact,
+                            selected: isSelected,
+                            selectedColor: isDark ? Colors.white : Colors.black,
+                            showCheckmark: false,
+                            side: const BorderSide(style: BorderStyle.none),
+                            backgroundColor: isDark
+                                ? (isSelected ? Colors.white : Colors.grey.shade800)
+                                : (isSelected ? Colors.black : Colors.grey.shade200),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            onSelected: (bool selected) {
+                              if (selected) {
+                                final key = ref.read(genresProvider).selectedGenre;
+                                final value = ref.read(moviesGenreProvider);
 
-                              ref.read(genresTabProvider.notifier).update(key, value);
+                                ref.read(genresTabProvider.notifier).update(key, value);
 
-                              ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
-                            }
-                          },
+                                ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
+                              }
+                            },
+                          ),
                         ),
                       );
                     }),
@@ -197,6 +208,8 @@ class _CustomGradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       width: width,
       child: DecoratedBox(
@@ -206,16 +219,16 @@ class _CustomGradientButton extends StatelessWidget {
             begin: begin,
             end: end,
             stops: const [0.5, 1.0],
-            colors: const [
-              Colors.black87,
-              Colors.transparent,
+            colors: [
+              if (isDark) Colors.black87 else Colors.transparent,
+              if (isDark) Colors.transparent else Colors.transparent,
             ],
           ),
         ),
         child: Align(
           alignment: alignment,
           child: IconButton(
-            icon: Icon(icon, color: Colors.white),
+            icon: Icon(icon, color: isDark ? Colors.white : Colors.black),
             onPressed: onPressed,
           ),
         ),
