@@ -13,8 +13,6 @@ class GenresView extends ConsumerStatefulWidget {
 }
 
 class GenresViewState extends ConsumerState<GenresView> with AutomaticKeepAliveClientMixin {
-  final ScrollController scrollController = ScrollController(); // Controlador para el desplazamiento
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -35,8 +33,7 @@ class GenresViewState extends ConsumerState<GenresView> with AutomaticKeepAliveC
 
     return Column(
       children: [
-        _GenreSelector(
-          scrollController: scrollController,
+        GenreSelector(
           genres: genresState.genres,
           selectedGenre: genresState.selectedGenre,
         ),
@@ -63,104 +60,153 @@ class _GenreMoviesView extends ConsumerWidget {
   }
 }
 
-class _GenreSelector extends ConsumerWidget {
-  final ScrollController scrollController;
+class GenreSelector extends ConsumerStatefulWidget {
   final List<Genre> genres;
   final int selectedGenre;
 
-  const _GenreSelector({
-    required this.scrollController,
+  const GenreSelector({
+    super.key,
     required this.genres,
     required this.selectedGenre,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  GenreSelectorState createState() => GenreSelectorState();
+}
+
+class GenreSelectorState extends ConsumerState<GenreSelector> {
+  final ScrollController scrollController = ScrollController();
+  bool isLeftArrowVisible = true;
+  bool isRightArrowVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (scrollController.offset <= 0 && isLeftArrowVisible) {
+      setState(() {
+        isLeftArrowVisible = false;
+      });
+    }
+
+    if (scrollController.offset > 0 && !isLeftArrowVisible) {
+      setState(() {
+        isLeftArrowVisible = true;
+      });
+    }
+
+    if (scrollController.offset >= scrollController.position.maxScrollExtent && isRightArrowVisible) {
+      setState(() {
+        isRightArrowVisible = false;
+      });
+    }
+
+    if (scrollController.offset < scrollController.position.maxScrollExtent && !isRightArrowVisible) {
+      setState(() {
+        isRightArrowVisible = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = ref.watch(themeNotifierProvider).isDarkMode; //Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: SizedBox(
-          height: 50,
-          child: Stack(
-            children: [
-              // ListView con ChoiceChips de géneros
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: ListView.builder(
-                    controller: scrollController, // Controlador de scroll
-                    scrollDirection: Axis.horizontal,
-                    itemCount: genres.length,
-                    itemBuilder: (context, index) {
-                      final genre = genres[index];
-                      bool isSelected = selectedGenre == genre.id;
+      child: Container(
+        height: 70,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        color: isDark ? Colors.black : Colors.white,
+        child: Stack(
+          children: [
+            // ListView con ChoiceChips de géneros
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: ListView.builder(
+                  controller: scrollController, // Controlador de scroll
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.genres.length,
+                  itemBuilder: (context, index) {
+                    final genre = widget.genres[index];
+                    bool isSelected = widget.selectedGenre == genre.id;
 
-                      return Container(
-                        color: isDark ? Colors.black : Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: ChoiceChip(
-                            label: Text(
-                              genre.name,
-                              style: TextStyle(
-                                color: isDark
-                                    ? (isSelected ? Colors.black : Colors.white)
-                                    : (isSelected ? Colors.white : Colors.black),
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    return Container(
+                      color: isDark ? Colors.black : Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: ChoiceChip(
+                          label: Text(
+                            genre.name,
+                            style: TextStyle(
+                              color: isDark
+                                  ? (isSelected ? Colors.black : Colors.white)
+                                  : (isSelected ? Colors.white : Colors.black),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
-                            visualDensity: isSelected ? VisualDensity.comfortable : VisualDensity.compact,
-                            selected: isSelected,
-                            selectedColor: isDark ? Colors.white : Colors.black,
-                            showCheckmark: false,
-                            side: const BorderSide(style: BorderStyle.none),
-                            backgroundColor: isDark
-                                ? (isSelected ? Colors.white : Colors.grey.shade800)
-                                : (isSelected ? Colors.black : Colors.grey.shade200),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            onSelected: (bool selected) {
-                              if (selected) {
-                                final key = ref.read(genresProvider).selectedGenre;
-                                final value = ref.read(moviesGenreProvider);
-
-                                ref.read(genresTabProvider.notifier).update(key, value);
-
-                                ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
-                              }
-                            },
                           ),
+                          visualDensity: isSelected ? VisualDensity.comfortable : VisualDensity.compact,
+                          selected: isSelected,
+                          selectedColor: isDark ? Colors.white : Colors.black,
+                          showCheckmark: false,
+                          side: const BorderSide(style: BorderStyle.none),
+                          backgroundColor: isDark
+                              ? (isSelected ? Colors.white : Colors.grey.shade800)
+                              : (isSelected ? Colors.black : Colors.grey.shade200),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          onSelected: (bool selected) {
+                            if (selected) {
+                              final key = ref.read(genresProvider).selectedGenre;
+                              final value = ref.read(moviesGenreProvider);
+
+                              ref.read(genresTabProvider.notifier).update(key, value);
+
+                              ref.read(genresProvider.notifier).updateSelectedGenre(genre.id);
+                            }
+                          },
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  }),
+            ),
+
+            // Flecha Izquierda
+            if (isLeftArrowVisible)
+              Positioned(
+                left: 0,
+                child: _CustomGradientButton(
+                    width: 70,
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    icon: Icons.arrow_back_ios,
+                    alignment: Alignment.centerLeft,
+                    onPressed: _scrollLeft),
               ),
 
-              // Flecha Izquierda
+            // Flecha Derecha
+            if (isRightArrowVisible)
               Positioned(
-                  left: 0,
-                  child: _CustomGradientButton(
-                      width: 70,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      icon: Icons.arrow_back_ios,
-                      alignment: Alignment.centerLeft,
-                      onPressed: _scrollLeft)),
-
-              // Flecha Derecha
-              Positioned(
-                  right: 0,
-                  child: _CustomGradientButton(
-                      width: 70,
-                      begin: Alignment.centerRight,
-                      end: Alignment.centerLeft,
-                      icon: Icons.arrow_forward_ios,
-                      alignment: Alignment.centerRight,
-                      onPressed: _scrollRight)),
-            ],
-          ),
+                right: 0,
+                child: _CustomGradientButton(
+                    width: 70,
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    icon: Icons.arrow_forward_ios,
+                    alignment: Alignment.centerRight,
+                    onPressed: _scrollRight),
+              ),
+          ],
         ),
       ),
     );
@@ -170,7 +216,7 @@ class _GenreSelector extends ConsumerWidget {
   void _scrollLeft() {
     if (scrollController.hasClients) {
       scrollController.animateTo(
-        scrollController.offset - 200, // Desplaza 100 píxeles a la izquierda
+        scrollController.offset - 200, // Desplaza 200 píxeles a la izquierda
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -181,7 +227,7 @@ class _GenreSelector extends ConsumerWidget {
   void _scrollRight() {
     if (scrollController.hasClients) {
       scrollController.animateTo(
-        scrollController.offset + 200, // Desplaza 100 píxeles a la derecha
+        scrollController.offset + 200, // Desplaza 200 píxeles a la derecha
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
