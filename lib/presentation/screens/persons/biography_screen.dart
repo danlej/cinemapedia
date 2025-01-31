@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -103,21 +105,78 @@ class _KnownForMovies extends StatelessWidget {
   }
 }
 
-class _BiographyDescription extends StatelessWidget {
+class _BiographyDescription extends StatefulWidget {
   final String content;
 
   const _BiographyDescription({required this.content});
 
   @override
+  State<_BiographyDescription> createState() => _BiographyDescriptionState();
+}
+
+class _BiographyDescriptionState extends State<_BiographyDescription> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolling = false;
+  Timer? _scrollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    // Verifica si realmente se está moviendo el scroll
+    bool isCurrentlyScrolling = _scrollController.position.userScrollDirection != ScrollDirection.idle;
+
+    if (isCurrentlyScrolling && !_isScrolling) {
+      setState(() => _isScrolling = true);
+    }
+
+    // Cancelamos cualquier Timer previo
+    _scrollTimer?.cancel();
+
+    // Iniciamos un nuevo Timer para detectar si el usuario deja de hacer scroll
+    _scrollTimer = Timer(const Duration(milliseconds: 300), () {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.idle) {
+        setState(() => _isScrolling = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _scrollTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (content.isEmpty) return const SizedBox();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (widget.content.isEmpty) return const SizedBox();
 
     return Stack(children: [
       Container(
         constraints: const BoxConstraints(maxHeight: 180),
+        decoration: BoxDecoration(
+          color: _isScrolling ? (isDark ? Colors.black : Colors.white) : null,
+          boxShadow: _isScrolling
+              ? [
+                  BoxShadow(
+                    color: isDark ? Colors.white54 : Colors.black.withAlpha(50),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : [],
+        ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: SizedBox(
-            child: Text(content),
+            child: Text(widget.content),
           ),
         ),
       ),
