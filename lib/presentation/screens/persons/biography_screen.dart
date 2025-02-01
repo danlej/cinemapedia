@@ -271,6 +271,15 @@ class _BiographyImage extends StatelessWidget {
                         height: MediaQuery.of(context).size.height * 0.8,
                         child: image,
                       ),
+                      const CustomGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        stops: [0.0, 0.2],
+                        colors: [
+                          Colors.black54,
+                          Colors.transparent,
+                        ],
+                      ),
                       Positioned(
                         top: 1,
                         right: 1,

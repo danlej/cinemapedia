@@ -211,7 +211,7 @@ class _CustomSliverAppBar extends ConsumerWidget {
       ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(bottom: 0),
-        title: _CustomGradient(
+        title: CustomGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             stops: const [0.7, 1.0],
@@ -229,7 +229,7 @@ class _CustomSliverAppBar extends ConsumerWidget {
               ),
             ),
             //* Back arrow background
-            const _CustomGradient(
+            const CustomGradient(
               begin: Alignment.topLeft,
               stops: [0.0, 0.3],
               colors: [
@@ -238,7 +238,7 @@ class _CustomSliverAppBar extends ConsumerWidget {
               ],
             ),
             //* Favorite Gradient Background
-            const _CustomGradient(
+            const CustomGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               stops: [0.0, 0.2],
@@ -258,36 +258,6 @@ class _CustomSliverAppBar extends ConsumerWidget {
             //   ],
             // ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CustomGradient extends StatelessWidget {
-  final AlignmentGeometry begin;
-  final AlignmentGeometry end;
-  final List<double> stops;
-  final List<Color> colors;
-
-  const _CustomGradient({
-    this.begin = Alignment.centerLeft,
-    this.end = Alignment.centerRight,
-    required this.stops,
-    required this.colors,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: begin,
-            end: end,
-            stops: stops,
-            colors: colors,
-          ),
         ),
       ),
     );

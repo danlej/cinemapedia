@@ -266,8 +266,8 @@ class _CustomGradientButton extends StatelessWidget {
             end: end,
             stops: const [0.5, 1.0],
             colors: [
-              if (isDark) Colors.black87 else Colors.transparent,
-              if (isDark) Colors.transparent else Colors.transparent,
+              if (isDark) Colors.black87 else Colors.white,
+              if (isDark) Colors.transparent else Colors.white10,
             ],
           ),
         ),
